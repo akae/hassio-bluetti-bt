@@ -240,12 +240,10 @@ class DeviceReader:
             _LOGGER.debug("Requesting %s", command)
             # encrypt message
             length, cmd = self.cryptModule.send_message(bytes(command))
-            modbus_cmd = command
-            modbus_cmd.cmd = cmd
             _LOGGER.debug("send len: " + str(length) + " message: " + cmd.hex())
-            self.current_command = modbus_cmd
+            self.current_command = command
 
-            await self.client.write_gatt_char(WRITE_UUID, bytes(modbus_cmd))
+            await self.client.write_gatt_char(WRITE_UUID, bytes(cmd))
 
             # Wait for response
             res = await asyncio.wait_for(self.notify_future, timeout=RESPONSE_TIMEOUT)
