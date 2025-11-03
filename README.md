@@ -70,14 +70,13 @@ docker exec -it homeassistant bash -c "
   
   exit
 "
+```
 
-# Get your Communication Board SN from Bluetti app (Settings > About Device)
-# Request bluetti_device_licence.csv from Bluetti support with your SN
-# Then copy it to config:
-# cp bluetti_device_licence.csv /path/to/homeassistant/config/
+* Get your Communication Board SN from Bluetti app (Settings > About Device)
+* Email service@bluettipower.com with your Communication Board SN to request bluetti_device_licence.csv
+* Then copy it to config dir `/path/to/homeassistant/config/bluetti_device_licence.csv`
 
 # Restart Home Assistant
-```
 
 **Note**: Integration works without encryption for most devices. Only needed for newer models that require it.
 
