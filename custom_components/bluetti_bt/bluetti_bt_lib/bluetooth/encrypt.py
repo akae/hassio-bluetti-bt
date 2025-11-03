@@ -15,12 +15,16 @@ class bleEncrypt:
     def __init__(self):
         self.cryptoClient = None
         self.enable = False
+        # Force disable encryption for compatibility testing
+        self.force_no_encryption = True
         if not CRYPT_AVAILABLE:
             _LOGGER.warning("Encryption module not available - all devices will use non-encrypted communication")
 
     def start(self, enable: bool = True):
-        if not CRYPT_AVAILABLE:
+        # Force non-encrypted mode for testing
+        if self.force_no_encryption or not CRYPT_AVAILABLE:
             self.enable = False
+            _LOGGER.info("Encryption forcibly disabled for compatibility testing")
             return
             
         self.cryptoClient = bluetti_crypt.BluettiCrypt()
