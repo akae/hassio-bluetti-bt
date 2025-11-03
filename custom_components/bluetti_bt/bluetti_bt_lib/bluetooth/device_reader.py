@@ -71,21 +71,33 @@ class DeviceReader:
                     for attempt in range(1, self.max_retries + 1):
                         try:
                             if not self.client.is_connected:
-                                # Whether encryption is supported
-                                devices = await BleakScanner.discover(timeout=10)
-                                for d in devices:
-                                    if str(self.bluetti_device.type) == "Handsfree":
-                                        bluetti_device_name = str(self.bluetti_device.type) + " " + str(self.bluetti_device.sn)
-                                    else:
-                                        bluetti_device_name = str(self.bluetti_device.type) + str(self.bluetti_device.sn)
-                                    if bluetti_device_name == d.name:
-                                        for(type, value) in d._metadata["manufacturer_data"].items():
-                                            if value == b'BLUETTF':
-                                                self.enable_crypt = True
-                                                break
+                                # Try to detect encryption support, but don't fail if we can't
+                                try:
+                                    devices = await BleakScanner.discover(timeout=5)  # Reduced timeout
+                                    for d in devices:
+                                        if str(self.bluetti_device.type) == "Handsfree":
+                                            bluetti_device_name = str(self.bluetti_device.type) + " " + str(self.bluetti_device.sn)
                                         else:
-                                            continue
-                                        break
+                                            bluetti_device_name = str(self.bluetti_device.type) + str(self.bluetti_device.sn)
+                                        if bluetti_device_name == d.name:
+                                            try:
+                                                # Check if device has manufacturer data indicating encryption support
+                                                if hasattr(d, '_metadata') and d._metadata and "manufacturer_data" in d._metadata:
+                                                    for(type, value) in d._metadata["manufacturer_data"].items():
+                                                        if value == b'BLUETTF':
+                                                            self.enable_crypt = True
+                                                            _LOGGER.info(f"Encryption support detected for device {bluetti_device_name}")
+                                                            break
+                                                else:
+                                                    # No metadata available - assume no encryption needed
+                                                    _LOGGER.debug(f"No metadata available for device {bluetti_device_name}, assuming non-encrypted")
+                                            except (AttributeError, KeyError, TypeError) as e:
+                                                # If we can't determine encryption support, default to non-encrypted
+                                                _LOGGER.debug(f"Could not determine encryption support for {bluetti_device_name}: {e}")
+                                            break
+                                except Exception as e:
+                                    # If device discovery fails entirely, continue without encryption
+                                    _LOGGER.warning(f"Device discovery failed, continuing without encryption detection: {e}")
 
                                 await self.client.connect()
                                 
