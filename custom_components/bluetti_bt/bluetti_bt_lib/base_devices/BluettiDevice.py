@@ -42,7 +42,11 @@ class BluettiDevice:
     def writable_ranges(self) -> List[range]:
         """The address ranges that are writable"""
         return []
-    
+
+    def read_sn_command(self) -> List[ReadHoldingRegisters]:
+        """read bluetti device serial number"""
+        return []
+
     @property
     def pack_num_field(self) -> List[ReadHoldingRegisters]:
         """The address 'range' of the pack num result. Matches pack_num_result"""
