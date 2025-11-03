@@ -48,19 +48,24 @@ AC and DC outputs
 
 ## Encryption Setup (For newer encrypted devices)
 
-Some newer Bluetti devices require encrypted communication. If your device needs encryption support:
+For devices that require encryption, copy and paste these commands:
 
-1. **Download the encryption module** from [Bluetti's official releases](https://github.com/bluetti-official/bluetti-bluetooth-lib/releases/)
-2. **Extract** `bluetti_crypt.py` and `_bluetti_crypt.so` (or `.pyd` for Windows)
-3. **Copy files** to your Python site-packages directory:
-   ```bash
-   # For Home Assistant OS (in container):
-   docker exec -it homeassistant bash
-   cp bluetti_crypt.py _bluetti_crypt.so /usr/local/lib/python3.*/site-packages/
-   ```
-4. **Get authorization file** `bluetti_device_licence.csv` from Bluetti (requires Communication Board SN from your device)
-5. **Place authorization file** in `/config/` directory
-6. **Restart Home Assistant** completely
+```bash
+# Download and install encryption module
+wget https://github.com/bluetti-official/bluetti-bluetooth-lib/releases/download/1.0.0/Bluetti_Crypt_Module_Linux-1.0.0.tar.gz
+tar -xzf Bluetti_Crypt_Module_Linux-1.0.0.tar.gz
+docker exec -it homeassistant bash -c "
+  cp bluetti_crypt.py _bluetti_crypt.so /usr/local/lib/python3.*/site-packages/
+  exit
+"
 
-**Note**: Integration works without encryption for older devices. Encryption is only needed for newer models that require it.
+# Get your Communication Board SN from Bluetti app (Settings > About Device)
+# Request bluetti_device_licence.csv from Bluetti support with your SN
+# Then copy it to config:
+# cp bluetti_device_licence.csv /path/to/homeassistant/config/
+
+# Restart Home Assistant
+```
+
+**Note**: Integration works without encryption for most devices. Only needed for newer models that require it.
 
