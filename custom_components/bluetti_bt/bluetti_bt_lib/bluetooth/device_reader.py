@@ -230,7 +230,7 @@ class DeviceReader:
             length, cmd = self.cryptModule.send_message(bytes(command))
             modbus_cmd = command
             modbus_cmd.cmd = cmd
-            logging.debug("send len: " + str(length) + " message: " + cmd.hex())
+            _LOGGER.debug("send len: " + str(length) + " message: " + cmd.hex())
             self.current_command = modbus_cmd
 
             await self.client.write_gatt_char(WRITE_UUID, bytes(modbus_cmd))
@@ -275,9 +275,10 @@ class DeviceReader:
         self.notify_response.extend(data)
 
         if self.is_crypting is False:
-            lenght, response = self.cryptModule.message_handle(data)
+            # Normal operation - decrypt if needed, otherwise use data as-is
+            lenght, response = self.cryptModule.message_handle(self.notify_response)
             if (0 >= lenght):
-                msg = f'Failed to decrypt response {lenght} : {data.hex()}'
+                msg = f'Failed to decrypt response {lenght} : {self.notify_response.hex()}'
                 self.notify_future.set_exception(ParseError(msg))
                 return
 
@@ -320,21 +321,21 @@ class DeviceReader:
                             bytes(cmd))
                 elif (4 == status):
                     """ Encrypt link connected """
-                    logging.info(f'client connect success')
+                    _LOGGER.info(f'client connect success')
                     return 1
                 elif (0 <= status and 0 < len(response)):
                     """ Pass-Through data to the bluetti encrypt module """
                     await self.client.write_gatt_char(
                         WRITE_UUID,
                         bytes(response))
-                    logging.info(f'client send authen data:' + response.hex())
+                    _LOGGER.info(f'client send authen data:' + response.hex())
 
                 retries += 1
 
             except asyncio.TimeoutError:
                 retries += 1
-                logging.warning(f' encrypt link timeout ')
+                _LOGGER.warning(f' encrypt link timeout ')
         if retries == 5:
-            logging.warning(f'client not receive authen data, now to disconnect')
+            _LOGGER.warning(f'client not receive authen data, now to disconnect')
             return -1
         return 0
