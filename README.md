@@ -52,9 +52,10 @@ For devices that require encryption, copy and paste these commands:
 
 ```bash
 # Download and install encryption module
-wget https://github.com/bluetti-official/bluetti-bluetooth-lib/releases/download/1.0.0/Bluetti_Crypt_Module_Linux-1.0.0.tar.gz
-tar -xzf Bluetti_Crypt_Module_Linux-1.0.0.tar.gz
 docker exec -it homeassistant bash -c "
+  cd /tmp
+  wget https://github.com/bluetti-official/bluetti-bluetooth-lib/releases/download/1.0.0/Bluetti_Crypt_Module_Linux-1.0.0.tar.gz
+  tar -xzf Bluetti_Crypt_Module_Linux-1.0.0.tar.gz
   cp bluetti_crypt.py _bluetti_crypt.so /usr/local/lib/python3.*/site-packages/
   exit
 "
