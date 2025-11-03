@@ -56,7 +56,18 @@ docker exec -it homeassistant bash -c "
   cd /tmp
   wget https://github.com/bluetti-official/bluetti-bluetooth-lib/releases/download/1.0.0/Bluetti_Crypt_Module_Linux-1.0.0.tar.gz
   tar -xzf Bluetti_Crypt_Module_Linux-1.0.0.tar.gz
-  cp bluetti_crypt.py _bluetti_crypt.so /usr/local/lib/python3.*/site-packages/
+  
+  # Get correct Python site-packages path
+  SITE_PACKAGES=\$(python3 -c 'import site; print(site.getsitepackages()[0])')
+  echo \"Installing to: \$SITE_PACKAGES\"
+  
+  # Copy files
+  cp bluetti_crypt.py _bluetti_crypt.so \$SITE_PACKAGES/
+  
+  # Verify installation
+  echo \"Files installed:\"
+  ls -la \$SITE_PACKAGES/bluetti_crypt.py \$SITE_PACKAGES/_bluetti_crypt.so
+  
   exit
 "
 
